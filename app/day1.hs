@@ -32,7 +32,7 @@ solution :: Monad m => ConduitT Int Void m (Integer, Integer)
 solution
   = Conduit.getZipSink $ liftA2 (,)
       (Conduit.ZipSink $ general 1) -- part 1 has a window size of 1
-      (Conduit.ZipSink $ general 3) -- part 2 has a window size of 2
+      (Conduit.ZipSink $ general 3) -- part 2 has a window size of 3
 
 -- get the input from stdin
 -- it's "correct" but damn inconvenient for stdin to give us a bytestring
@@ -43,12 +43,10 @@ getInput
   .| Conduit.map readAsInt
   where
     readAsInt :: BSC.ByteString -> Int
-    readAsInt = BSC.foldl (\r x -> digitToInt x + 10 * r) 0
+    readAsInt = BSC.foldl' (\r x -> digitToInt x + 10 * r) 0
 
 main' :: ConduitT () Void IO (Integer, Integer)
-main'
-  =  getInput
-  .| solution
+main' =  getInput .| solution
 
 main :: IO ()
 main = do
