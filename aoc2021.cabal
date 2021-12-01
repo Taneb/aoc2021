@@ -12,6 +12,5 @@ executable day1
     build-depends:    base
                     , bytestring
                     , conduit
-                    , containers
     hs-source-dirs:   app
     default-language: Haskell2010

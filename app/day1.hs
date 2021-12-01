@@ -6,29 +6,22 @@ import Data.Char (digitToInt)
 import Data.Conduit (ConduitT, (.|))
 import qualified Data.Conduit as Conduit
 import qualified Data.Conduit.Combinators as Conduit
-import Data.Sequence (Seq, ViewL ((:<)), ViewR ((:>)))
-import qualified Data.Sequence as Seq
 import Data.Void
 
 -- to compare the sums of two sliding windows, we only need to compare the
 -- elements where they differ, that is, the first and last elements.
-general :: Monad m => Int -> ConduitT Int o m Integer
+general :: Monad m => Int -> ConduitT Int o m Int
 general windowSize
   =  Conduit.slidingWindow (windowSize + 1)
   .| Conduit.lengthIf measure
   where
-    -- we use Data.Sequence because it has O(1) head, tail, and uncons
-    measure :: Seq Int -> Bool
-    measure window =
-      let
-        (a :< _) = Seq.viewl window
-        (_ :> b) = Seq.viewr window
-      in a < b
+    measure :: [Int] -> Bool
+    measure xs = head xs < last xs
 
 -- find the answers to both part 1 and part 2
 -- we need to use ZipSink here so it sends the input to both parts, without
 -- keeping the whole input in memory
-solution :: Monad m => ConduitT Int Void m (Integer, Integer)
+solution :: Monad m => ConduitT Int Void m (Int, Int)
 solution
   = Conduit.getZipSink $ liftA2 (,)
       (Conduit.ZipSink $ general 1) -- part 1 has a window size of 1
@@ -45,8 +38,8 @@ getInput
     readAsInt :: BSC.ByteString -> Int
     readAsInt = BSC.foldl' (\r x -> digitToInt x + 10 * r) 0
 
-main' :: ConduitT () Void IO (Integer, Integer)
-main' =  getInput .| solution
+main' :: ConduitT () Void IO (Int, Int)
+main' = getInput .| solution
 
 main :: IO ()
 main = do
