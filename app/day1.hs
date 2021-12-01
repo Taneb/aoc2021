@@ -38,11 +38,8 @@ getInput
     readAsInt :: BSC.ByteString -> Int
     readAsInt = BSC.foldl' (\r x -> digitToInt x + 10 * r) 0
 
-main' :: ConduitT () Void IO (Int, Int)
-main' = getInput .| solution
-
 main :: IO ()
 main = do
-  (a, b) <- Conduit.runConduit main'
+  (a, b) <- Conduit.runConduit (getInput .| solution)
   print a
   print b
