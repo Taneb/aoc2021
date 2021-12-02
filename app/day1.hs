@@ -1,7 +1,7 @@
-module Main where
+module Main (main) where
 
 import Control.Applicative (liftA2)
-import qualified Data.ByteString.Char8 as BSC
+import qualified Data.ByteString as BS
 import Data.Char (digitToInt)
 import Data.Conduit (ConduitT, (.|))
 import qualified Data.Conduit as Conduit
@@ -17,6 +17,7 @@ general windowSize
   where
     measure :: [Int] -> Bool
     measure xs = head xs < last xs
+{-# INLINE general #-}
 
 -- find the answers to both part 1 and part 2
 -- we need to use ZipSink here so it sends the input to both parts, without
@@ -26,6 +27,7 @@ solution
   = Conduit.getZipSink $ liftA2 (,)
       (Conduit.ZipSink $ general 1) -- part 1 has a window size of 1
       (Conduit.ZipSink $ general 3) -- part 2 has a window size of 3
+{-# INLINE solution #-}
 
 -- get the input from stdin
 -- it's "correct" but damn inconvenient for stdin to give us a bytestring
@@ -35,8 +37,9 @@ getInput
   .| Conduit.linesUnboundedAscii
   .| Conduit.map readAsInt
   where
-    readAsInt :: BSC.ByteString -> Int
-    readAsInt = BSC.foldl' (\r x -> digitToInt x + 10 * r) 0
+    readAsInt :: BS.ByteString -> Int
+    readAsInt = BS.foldl' (\r x -> fromIntegral x - 47 + 10 * r) 0
+{-# INLINE getInput #-}
 
 main :: IO ()
 main = do
