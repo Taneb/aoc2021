@@ -8,6 +8,8 @@ import Data.Conduit (ConduitT, (.|))
 import qualified Data.Conduit as C
 import qualified Data.Conduit.Attoparsec as C
 import qualified Data.Conduit.Combinators as C
+import Data.Either
+import Data.Foldable
 import Data.List
 import Data.Maybe
 import Data.Void
@@ -32,12 +34,15 @@ checkVictory b = checkRows b || checkCols b
     checkCols = checkRows . transpose
 
 boardTurnAndScore :: Board -> [Int] -> (Int, Int)
-boardTurnAndScore _ [] = error "Unreachable"
-boardTurnAndScore b (c:cs) =
-  let b' = markNumber c b
-  in if checkVictory b'
-    then (0, c * sum (catMaybes $ concat b'))
-    else first (+1) $ boardTurnAndScore b' cs
+boardTurnAndScore b = fromLeft (error "unreachable") . foldlM f b . zip [0..]
+  where
+    f :: Board -> (Int, Int) -> Either (Int, Int) Board
+    f b (i, c) =
+      let b' = markNumber c b
+      in if checkVictory b'
+        then Left (i, c * sum (catMaybes $ concat b'))
+        else Right b'
+
 
 solution :: [Int] -> ConduitT Board Void IO (Int, Int)
 solution calls = finalize <$> C.foldl checkBoard ((100, 0), (0, 0))
