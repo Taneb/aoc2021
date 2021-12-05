@@ -36,7 +36,6 @@ executable day4
     main-is:          day4.hs
     build-depends:    base
                     , megaparsec
-                    , parser-combinators
     hs-source-dirs:   app
     default-language: Haskell2010
 
