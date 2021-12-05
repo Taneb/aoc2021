@@ -24,3 +24,18 @@ executable day2
                     , conduit-extra
     hs-source-dirs:   app
     default-language: Haskell2010
+
+executable day3
+    main-is:          day3.hs
+    build-depends:    base
+                    , regex-applicative
+    hs-source-dirs:   app
+    default-language: Haskell2010
+
+executable day4
+    main-is:          day4.hs
+    build-depends:    base
+                    , megaparsec
+                    , parser-combinators
+    hs-source-dirs:   app
+    default-language: Haskell2010
