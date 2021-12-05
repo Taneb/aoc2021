@@ -16,11 +16,11 @@ import Data.Void
 
 type Board = [[Maybe Int]]
 
-parseCalls' :: Parser [Int]
-parseCalls' = sepBy decimal (char ',') <* endOfLine
+parseCalls :: Parser [Int]
+parseCalls = sepBy decimal (char ',') <* endOfLine
 
-parseBoard' :: Parser Board
-parseBoard' = do
+parseBoard :: Parser Board
+parseBoard = do
   endOfLine
   map (map Just) <$> count 5 (count 5 (many space *> decimal) <* endOfLine)
 
@@ -56,8 +56,8 @@ solution calls = finalize <$> C.foldl checkBoard ((100, 0), (0, 0))
 
 fullSolution :: ConduitT () Void IO (Int, Int)
 fullSolution = C.stdin .| do
-  calls <- C.sinkParser parseCalls'
-  C.conduitParser parseBoard' .| C.map snd .| solution calls
+  calls <- C.sinkParser parseCalls
+  C.conduitParser parseBoard .| C.map snd .| solution calls
 
 main :: IO ()
 main = do
