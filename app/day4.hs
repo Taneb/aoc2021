@@ -1,30 +1,26 @@
 module Main where
 
+import Control.Applicative
+import Data.Attoparsec.ByteString.Char8
 import Data.Bifunctor (first)
+import Data.ByteString (ByteString)
+import Data.Conduit (ConduitT, (.|))
+import qualified Data.Conduit as C
+import qualified Data.Conduit.Attoparsec as C
+import qualified Data.Conduit.Combinators as C
 import Data.List
 import Data.Maybe
 import Data.Void
-import Text.Megaparsec
-import Text.Megaparsec.Char
-import qualified Text.Megaparsec.Char.Lexer as L
 
 type Board = [[Maybe Int]]
 
-type Parser = Parsec Void String
+parseCalls' :: Parser [Int]
+parseCalls' = sepBy decimal (char ',') <* endOfLine
 
-parseInput = do
-  cs <- parseCalls
-  _ <- newline
-  _ <- newline
-  bs <- parseBoards
-  pure (cs, bs)
-  where
-    parseCalls :: Parser [Int]
-    parseCalls = sepBy L.decimal (char ',')
-    parseBoards :: Parser [Board]
-    parseBoards = sepBy parseBoard newline
-    parseBoard :: Parser Board
-    parseBoard = map (map Just) <$> count 5 (count 5 (space *> L.decimal) <* newline)
+parseBoard' :: Parser Board
+parseBoard' = do
+  endOfLine
+  map (map Just) <$> count 5 (count 5 (many space *> decimal) <* endOfLine)
 
 markNumber :: Int -> Board -> Board
 markNumber c = map (map (\x -> if x == Just c then Nothing else x))
@@ -43,19 +39,23 @@ boardTurnAndScore b (c:cs) =
     then (0, c * sum (catMaybes $ concat b'))
     else first (+1) $ boardTurnAndScore b' cs
 
-combined :: [Int] -> [Board] -> (Int, Int)
-combined calls bs0 =
-  let ((_, p1),(_, p2)) = go ((100, 0),(0, 0)) bs0
-  in (p1, p2)
+solution :: [Int] -> ConduitT Board Void IO (Int, Int)
+solution calls = finalize <$> C.foldl checkBoard ((100, 0), (0, 0))
   where
-    go :: ((Int, Int), (Int, Int)) -> [Board] -> ((Int, Int), (Int, Int))
-    go p [] = p
-    go (p1@(d1, _), p2@(d2, _)) (b:bs) = case boardTurnAndScore b calls of
-      pc@(dc, _) -> go (if dc < d1 then pc else p1, if d2 < dc then pc else p2) bs
+    finalize :: ((Int, Int), (Int, Int)) -> (Int, Int)
+    finalize ((_, p1), (_, p2)) = (p1, p2)
+
+    checkBoard (p1, p2) b =
+      let pc = boardTurnAndScore b calls
+      in (min p1 pc, max p2 pc)
+
+fullSolution :: ConduitT () Void IO (Int, Int)
+fullSolution = C.stdin .| do
+  calls <- C.sinkParser parseCalls'
+  C.conduitParser parseBoard' .| C.map snd .| solution calls
 
 main :: IO ()
 main = do
-  Just (cs, bs) <- parseMaybe parseInput <$> getContents
-  let (p1, p2) = combined cs bs
+  (p1, p2) <- C.runConduit fullSolution
   print p1
   print p2
