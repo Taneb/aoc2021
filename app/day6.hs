@@ -5,24 +5,12 @@ module Main where
 import Linear
 import Linear.V
 
-{-
-We can do this with MATRICES!
+-- We can do this with matrices!
 
-Here's a horrible 9x9 matric that described the populaiton changes after one
-generation.
-
-0 0 0 0 0 0 1 0 1
-1 0 0 0 0 0 0 0 0
-0 1 0 0 0 0 0 0 0
-0 0 1 0 0 0 0 0 0
-0 0 0 1 0 0 0 0 0
-0 0 0 0 1 0 0 0 0
-0 0 0 0 0 1 0 0 0
-0 0 0 0 0 0 1 0 0
-0 0 0 0 0 0 0 1 0
-0 0 0 0 0 0 0 0 1
--}
-
+-- Here's a matrix that represents the population change in a single day
+-- When you multiply by a column vector containing the number of lanternfish
+-- with each possible timer value, it gives you another vector containing the
+-- amounts for the subsequent days.
 gen1Mat :: V 9 (V 9 Integer)
 gen1Mat =
   V [ V [0,1,0,0,0,0,0,0,0]
@@ -36,6 +24,10 @@ gen1Mat =
     , V [1,0,0,0,0,0,0,0,0]
     ]
 
+-- We can work out corresponding matrices that work out, rather than the
+-- population change after one day, the change after any number of days, by
+-- raising 'gen1Mat' to the power of the number of days desired. I precompute
+-- the matrices needed for the problem. Here's gen1Mat ^ 80
 gen80Mat :: V 9 (V 9 Int)
 gen80Mat =
   V [ V [252, 20,210, 37,120, 84, 45,126, 11]
@@ -49,6 +41,7 @@ gen80Mat =
     , V [ 20,210, 37,120, 84, 45,126, 11,126]
     ]
 
+-- And here's gen1Mat^256. Pretty big numbers, aren't they.
 gen256Mat :: V 9 (V 9 Int)
 gen256Mat =
   V [ V [ 655568076, 496266131,589731885,399865906,491122368,357868865,378763547,339582910,280698774]
