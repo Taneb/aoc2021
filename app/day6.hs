@@ -55,6 +55,15 @@ gen256Mat =
     , V [ 496266131, 589731885,399865906,491122368,357868865,378763547,339582910,280698774,315985166]
     ]
 
+-- Because we're going to just be taking the sum of the product with the vector
+-- to get the total number of individuals, we can rearrange a bit so we take
+-- the dot product with a sort of collapse of the matrix. The linear library
+-- has this function as 'sumV' but we can get away with precomputing it.
+gen80Vec :: V 9 Int
+gen80Vec = V [1421,1401,1191,1154,1034,950,905,779,768]
+
+gen256Vec :: V 9 Int
+gen256Vec = V [6703087164,6206821033,5617089148,5217223242,4726100874,4368232009,3989468462,3649885552,3369186778]
 
 main :: IO ()
 main = do
@@ -72,5 +81,5 @@ main = do
           , length $ filter (== '7') input
           , length $ filter (== '8') input
           ]
-  print $ sum $ gen80Mat !* initialPopulation
-  print $ sum $ gen256Mat !* initialPopulation
+  print $ gen80Vec `dot` initialPopulation
+  print $ gen256Vec `dot` initialPopulation
