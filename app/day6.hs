@@ -2,6 +2,7 @@
 {-# LANGUAGE OverloadedLists #-}
 module Main where
 
+import Data.List
 import Linear
 import Linear.V
 
@@ -65,21 +66,30 @@ gen80Vec = V [1421,1401,1191,1154,1034,950,905,779,768]
 gen256Vec :: V 9 Int
 gen256Vec = V [6703087164,6206821033,5617089148,5217223242,4726100874,4368232009,3989468462,3649885552,3369186778]
 
+-- Even now we can simplify! Because the input only contains lanternfish who
+-- are at days 1 through 6 in their lifecycle, we can remove from the vectors
+-- elements 0, 7, and 8.
+
+gen80VecTruncated :: V 6 Int
+gen80VecTruncated = V [1401,1191,1154,1034,950,905]
+
+gen256VecTruncated :: V 6 Int
+gen256VecTruncated = V [6206821033,5617089148,5217223242,4726100874,4368232009,3989468462]
+
+parseInput :: String -> V 6 Int
+parseInput = foldl' f zero
+  where
+    f :: V 6 Int -> Char -> V 6 Int
+    f v '1' = v ^+^ V [1,0,0,0,0,0]
+    f v '2' = v ^+^ V [0,1,0,0,0,0]
+    f v '3' = v ^+^ V [0,0,1,0,0,0]
+    f v '4' = v ^+^ V [0,0,0,1,0,0]
+    f v '5' = v ^+^ V [0,0,0,0,1,0]
+    f v '6' = v ^+^ V [0,0,0,0,0,1]
+    f v _ = v
+
 main :: IO ()
 main = do
-  input <- filter (/= ',') <$> getContents
-  let
-    initialPopulation :: V 9 Int
-    initialPopulation 
-      = V [ length $ filter (== '0') input
-          , length $ filter (== '1') input
-          , length $ filter (== '2') input
-          , length $ filter (== '3') input
-          , length $ filter (== '4') input
-          , length $ filter (== '5') input
-          , length $ filter (== '6') input
-          , length $ filter (== '7') input
-          , length $ filter (== '8') input
-          ]
-  print $ gen80Vec `dot` initialPopulation
-  print $ gen256Vec `dot` initialPopulation
+  initialPopulation <- parseInput <$> getContents
+  print $  gen80VecTruncated `dot` initialPopulation
+  print $ gen256VecTruncated `dot` initialPopulation
