@@ -43,7 +43,6 @@ boardTurnAndScore b = fromLeft (error "unreachable") . foldlM f b . zip [0..]
         then Left (i, c * sum (catMaybes $ concat b'))
         else Right b'
 
-
 solution :: [Int] -> ConduitT Board Void IO (Int, Int)
 solution calls = finalize <$> C.foldl checkBoard ((100, 0), (0, 0))
   where
