@@ -80,3 +80,12 @@ executable day10
     build-depends:    base
     hs-source-dirs:   app
     default-language: Haskell2010
+
+executable day11
+    main-is:          day11.hs
+    build-depends:    base
+                    , constraints
+                    , finite-typelits
+                    , vector-sized
+    hs-source-dirs:   app
+    default-language: Haskell2010
