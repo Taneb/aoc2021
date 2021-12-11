@@ -84,7 +84,6 @@ executable day10
 executable day11
     main-is:          day11.hs
     build-depends:    base
-                    , constraints
                     , finite-typelits
                     , vector-sized
     hs-source-dirs:   app
