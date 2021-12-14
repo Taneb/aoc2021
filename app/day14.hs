@@ -16,9 +16,9 @@ stepOnPairCounts ks = M.foldrWithKey go M.empty
       Nothing -> M.insertWith (+) p k
       Just c -> M.insertWith (+) (a, c) k . M.insertWith (+) (c, b) k
 
--- NB. undercounts the element that was last in the initial string by 1
+-- NB. undercounts the element that was first in the initial string by 1
 pairCountsToCounts :: Map (Char, Char) Int -> Map Char Int
-pairCountsToCounts = M.foldrWithKey (\(a, _) -> M.insertWith (+) a) M.empty
+pairCountsToCounts = M.foldrWithKey (\(_, b) -> M.insertWith (+) b) M.empty
 
 score :: Map Char Int -> Int
 score = ((-) <$> maximum <*> minimum) . M.elems
@@ -38,17 +38,17 @@ parse _ = error "Unrecognized input"
 part1 :: Map (Char, Char) Char -> String -> Int
 part1 ks t =
   let
-    final = last t
+    initial = head t
     ps = countPairs t
-  in score . M.adjust (+ 1) final . pairCountsToCounts $ iterate (stepOnPairCounts ks) ps !! 10
+  in score . M.adjust (+ 1) initial . pairCountsToCounts $ iterate (stepOnPairCounts ks) ps !! 10
 
 
 part2 :: Map (Char, Char) Char -> String -> Int
 part2 ks t =
   let
-    final = last t
+    initial = head t
     ps = countPairs t
-  in score . M.adjust (+ 1) final . pairCountsToCounts $ iterate (stepOnPairCounts ks) ps !! 40
+  in score . M.adjust (+ 1) initial . pairCountsToCounts $ iterate (stepOnPairCounts ks) ps !! 40
 
 main :: IO ()
 main = do
