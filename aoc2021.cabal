@@ -102,3 +102,10 @@ executable day13
                     , containers
     hs-source-dirs:   app
     default-language: Haskell2010
+
+executable day14
+    main-is:          day14.hs
+    build-depends:    base
+                    , containers
+    hs-source-dirs:   app
+    default-language: Haskell2010
