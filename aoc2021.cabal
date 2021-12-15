@@ -109,3 +109,12 @@ executable day14
                     , containers
     hs-source-dirs:   app
     default-language: Haskell2010
+
+executable day15
+    main-is:          day15.hs
+    build-depends:    base
+                    , array
+                    , containers
+                    , pqueue
+    hs-source-dirs:   app
+    default-language: Haskell2010
